@@ -1,0 +1,29 @@
+.skill-node {
+    border: 1px solid gray;
+    border-radius: 10px;
+    background-color: rgb(119, 182, 182);
+}
+
+.skill-node-body {
+  width: 150px;
+  height: 40px;
+  position: relative;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.node-handle {
+  width: 100%;
+  height: 100%;
+  background: blue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+  opacity: 0;
+}
