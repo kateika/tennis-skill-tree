@@ -8,7 +8,7 @@ module.exports = {
     main: './src/index.tsx',
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.scss'],
+    extensions: ['.ts', '.tsx', '.js', '.scss', '.css'],
     alias: {
       '@components': path.resolve(__dirname, 'src/components'),
       '@routes': path.resolve(__dirname, 'src/routes'),
@@ -29,7 +29,7 @@ module.exports = {
         loader: 'ts-loader',
       },
       {
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: ['style-loader','css-loader', 'sass-loader']
       },
       {
