@@ -1,0 +1,100 @@
+$border-radius: 50%;
+$draggable-handler-width: 20px;
+
+.skill-node {
+  border: 1px solid gray;
+  border-radius: $border-radius;
+  position: relative
+}
+
+.skill-node-selected {
+  border: 1px solid yellow;
+  border-radius: $border-radius;
+  background-color: rgb(97, 81, 202);
+}
+
+.skill-node-disabled {
+  border: 1px solid black;
+  border-radius: $border-radius;
+  background-color: rgb(76, 76, 77);
+}
+
+.skill-node-body {
+  width: 150px;
+  min-height: 20px;
+  padding: 10px;
+  position: relative;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.6em;
+}
+
+.node-handle {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+  opacity: 0;
+}
+
+/* button styles */
+.unlock-skill-button {
+  margin-top: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  font-size: 1em;
+  position: absolute;
+  bottom: 1px;
+}
+
+/* styles for the raquet */
+.racket-grid {
+  border: 3px solid black;
+  background-size: 7px 7px;
+  background-image:
+    linear-gradient(to right, rgb(226, 226, 226) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(226, 226, 226) 1px, transparent 1px);
+}
+
+/* styles for the tennis ball as a draggable handler */
+.draggable-ball {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: -30px;
+  right: 0;
+  background: #c9f364;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.draggable-ball:before,
+.draggable-ball:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: transparent;
+
+}
+
+.draggable-ball:before {
+  left: -65%;
+}
+
+.draggable-ball:after {
+  right: -65%;
+}
