@@ -1,3 +1,115 @@
+$main-color: #c9f364;
+
+:focus {
+    outline: none;
+}
+
 .form-wrapper {
-    background-color: grey;
+    background-color: white;
+    height: 100vh;
+    padding: 20px;
+    border-left: 1px solid $main-color;
+}
+
+/* Button styles */
+.form-button {
+    padding: 9px 14px 11px;
+    background: $main-color;
+    text-decoration: none;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
+
+.form-button {
+    display: inline-block;
+    $outerBorderWidth: 4px;
+    $innerBorderWidth: 2px;
+
+    position: relative;
+
+    &:before {
+        content: '';
+        position: absolute;
+        border: white solid $innerBorderWidth;
+        top: $outerBorderWidth;
+        left: $outerBorderWidth;
+        right: $outerBorderWidth;
+        bottom: $outerBorderWidth;
+        opacity: 0;
+        transition-duration: .2s;
+        transition-property: opacity;
+    }
+
+    &:hover:before {
+        opacity: 1;
+    }
+}
+
+/* Input styles */
+.input-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.form-input {
+    border: 1px solid #ccc;
+    padding: 7px 14px 9px;
+    transition: 0.4s;
+}
+
+.form-error {
+    color: rgb(193, 54, 54);
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.form-input~.focus-border:before,
+.form-input~.focus-border:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: rgb(60, 60, 60);
+    transition: 0.3s;
+}
+
+.form-input~.focus-border:after {
+    top: auto;
+    bottom: 0;
+    left: auto;
+    right: 0;
+}
+
+.form-input~.focus-border i:before,
+.form-input~.focus-border i:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 0;
+    background-color: black;
+    transition: 0.4s;
+}
+
+.form-input~.focus-border i:after {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: 0;
+}
+
+.form-input:focus~.focus-border:before,
+.form-input:focus~.focus-border:after {
+    width: 100%;
+    transition: 0.3s;
+}
+
+.form-input:focus~.focus-border i:before,
+.form-input:focus~.focus-border i:after {
+    height: 100%;
+    transition: 0.4s;
 }

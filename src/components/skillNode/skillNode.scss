@@ -1,5 +1,6 @@
 $border-radius: 50%;
 $draggable-handler-width: 20px;
+$main-color: #c9f364;
 
 .skill-node {
   border: 1px solid gray;
@@ -7,24 +8,11 @@ $draggable-handler-width: 20px;
   position: relative
 }
 
-.skill-node-selected {
-  border: 1px solid yellow;
-  border-radius: $border-radius;
-  background-color: rgb(97, 81, 202);
-}
-
-.skill-node-disabled {
-  border: 1px solid black;
-  border-radius: $border-radius;
-  background-color: rgb(76, 76, 77);
-}
-
 .skill-node-body {
   width: 150px;
   min-height: 20px;
   padding: 10px;
   position: relative;
-  border-radius: 10px;
   font-weight: bold;
   font-size: 0.6em;
 }
@@ -43,25 +31,53 @@ $draggable-handler-width: 20px;
 
 /* button styles */
 .unlock-skill-button {
-  margin-top: 5px;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 5px 10px;
   border: none;
-  border-radius: 5px;
-  background-color: #4CAF50;
-  color: white;
-  cursor: pointer;
+  border-radius: $border-radius;
+  background-color: $main-color;
+  color: black;
   font-size: 1em;
-  position: absolute;
-  bottom: 1px;
+  cursor: pointer;
+  z-index: 10;
 }
 
-/* styles for the raquet */
+.skill-node-locked .unlock-skill-button {
+  pointer-events: none;
+  color: white;
+  background-color: gray;
+}
+
+/* styles for the racquet */
 .racket-grid {
   border: 3px solid black;
+  border-radius: $border-radius;
   background-size: 7px 7px;
   background-image:
     linear-gradient(to right, rgb(226, 226, 226) 1px, transparent 1px),
     linear-gradient(to bottom, rgb(226, 226, 226) 1px, transparent 1px);
+}
+
+/* styles for different node states */
+.skill-node-detached.racket-grid {
+  border: 3px dashed rgb(94, 94, 94);
+}
+
+.skill-node-locked.racket-grid {
+  border: 3px solid rgb(94, 94, 94);
+}
+
+.skill-node-locked {
+  color: rgb(94, 94, 94)
+}
+
+.skill-node-detached .draggable-ball,
+.skill-node-available .draggable-ball,
+.skill-node-locked .draggable-ball {
+  background: gray;
 }
 
 /* styles for the tennis ball as a draggable handler */
@@ -71,9 +87,9 @@ $draggable-handler-width: 20px;
   height: 20px;
   bottom: -30px;
   right: 0;
-  background: #c9f364;
+  background: $main-color;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotate(45deg);
   overflow: hidden;
   cursor: pointer;
 }
