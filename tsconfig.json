@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "module": "ES2015",
     "target": "ES5",
-    "jsx": "react-jsx",
+    "jsx": "react",
     "lib": [
       "esnext",
       "dom"
@@ -14,9 +14,14 @@
     "allowJs": true,
     "baseUrl": "./",
     "paths": {
-      "@components/*": ["src/components/*"],
+      "@components/*": [
+        "src/components/*"
+      ],
     },
-    "types": ["jest", "node"]
+    "types": [
+      "jest",
+      "node"
+    ]
   },
   "exclude": [
     "node_modules",

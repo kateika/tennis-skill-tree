@@ -1,3 +1,4 @@
+import React from 'react';
 import { SkillNodeData } from '@components/skillNode/SkillNode';
 import './addNodeForm.scss';
 import { FC, useState, FormEvent } from 'react';
@@ -71,7 +72,7 @@ const AddNodeForm: FC = () => {
                 </span>
             </div>
 
-            {hasFormError && <p className="form-error">Please fill in all fields</p>}
+            {hasFormError && <p className="form-error">Please fill in a skill</p>}
             <button type="submit" className="form-button">Add Node</button>
         </form>
     );

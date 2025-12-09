@@ -1,3 +1,4 @@
+import React from 'react';
 import { Handle, Position, useConnection, useNodesData, Node, useReactFlow, applyNodeChanges, NodeChange } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';

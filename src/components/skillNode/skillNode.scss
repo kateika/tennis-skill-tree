@@ -3,9 +3,9 @@ $draggable-handler-width: 20px;
 $main-color: #c9f364;
 
 .skill-node {
-  border: 1px solid gray;
+  border: 1px solid #808080;
   border-radius: $border-radius;
-  position: relative
+  position: relative;
 }
 
 .skill-node-body {
@@ -25,7 +25,7 @@ $main-color: #c9f364;
   right: 0;
   border-radius: 0;
   transform: none;
-  border: none;
+  border: 0;
   opacity: 0;
 }
 
@@ -40,10 +40,10 @@ $main-color: #c9f364;
   left: 50%;
   transform: translateX(-50%);
   padding: 5px 10px;
-  border: none;
+  border: 0;
   border-radius: $border-radius;
   background-color: $main-color;
-  color: black;
+  color: #000;
   font-size: 1em;
   cursor: pointer;
   z-index: 10;
@@ -51,13 +51,14 @@ $main-color: #c9f364;
 
 .skill-node-locked .unlock-skill-button {
   pointer-events: none;
-  color: white;
-  background-color: gray;
+  color: #fff;
+  background-color: #808080;
+  ;
 }
 
 /* styles for the racquet */
 .racket-grid {
-  border: 3px solid black;
+  border: 3px solid #000;
   border-radius: $border-radius;
   background-size: 7px 7px;
   background-image:
@@ -77,13 +78,13 @@ $main-color: #c9f364;
 
 .skill-node-locked,
 .skill-node-available {
-  color: rgb(94, 94, 94)
+  color: rgb(94, 94, 94);
 }
 
 .skill-node-detached .draggable-ball,
 .skill-node-available .draggable-ball,
 .skill-node-locked .draggable-ball {
-  background: gray;
+  background: #808080;
 }
 
 /* styles for the tennis ball as a draggable handler */
@@ -100,8 +101,8 @@ $main-color: #c9f364;
   cursor: pointer;
 }
 
-.draggable-ball:before,
-.draggable-ball:after {
+.draggable-ball::before,
+.draggable-ball::after {
   content: '';
   position: absolute;
   width: 100%;
@@ -113,10 +114,10 @@ $main-color: #c9f364;
 
 }
 
-.draggable-ball:before {
+.draggable-ball::before {
   left: -65%;
 }
 
-.draggable-ball:after {
+.draggable-ball::after {
   right: -65%;
 }

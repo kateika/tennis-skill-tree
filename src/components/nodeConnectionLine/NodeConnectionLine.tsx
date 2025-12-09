@@ -1,3 +1,4 @@
+import React from 'react';
 import { ConnectionLineComponentProps, getStraightPath } from '@xyflow/react';
 
 const NodeConnectionLine = ({ fromX, fromY, toX, toY, connectionLineStyle }: ConnectionLineComponentProps) => {
