@@ -29,6 +29,10 @@ $main-color: #c9f364;
   opacity: 0;
 }
 
+.node-handle-invalid {
+  cursor: not-allowed !important;
+}
+
 /* button styles */
 .unlock-skill-button {
   position: absolute;
@@ -66,11 +70,13 @@ $main-color: #c9f364;
   border: 3px dashed rgb(94, 94, 94);
 }
 
-.skill-node-locked.racket-grid {
+.skill-node-locked.racket-grid,
+.skill-node-available.racket-grid {
   border: 3px solid rgb(94, 94, 94);
 }
 
-.skill-node-locked {
+.skill-node-locked,
+.skill-node-available {
   color: rgb(94, 94, 94)
 }
 

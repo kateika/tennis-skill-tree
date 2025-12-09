@@ -1,7 +1,6 @@
-import { getStraightPath } from '@xyflow/react';
+import { ConnectionLineComponentProps, getStraightPath } from '@xyflow/react';
 
-/*@ts-ignore */
-const NodeConnectionLine = ({ fromX, fromY, toX, toY, connectionLineStyle }) => {
+const NodeConnectionLine = ({ fromX, fromY, toX, toY, connectionLineStyle }: ConnectionLineComponentProps) => {
     const [edgePath] = getStraightPath({
         sourceX: fromX,
         sourceY: fromY,

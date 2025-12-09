@@ -1,9 +1,8 @@
-import { BaseEdge, getStraightPath, useInternalNode } from '@xyflow/react';
+import { BaseEdge, EdgeProps, getStraightPath, useInternalNode } from '@xyflow/react';
 
-import { getEdgeParams } from './edgeCalc.js';
+import { getEdgeParams } from './edgeCalc';
 
-/*@ts-ignore */
-function Edge({ id, source, target, markerEnd, style }) {
+function Edge({ id, source, target, markerEnd, style }: EdgeProps) {
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
 

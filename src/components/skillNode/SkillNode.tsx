@@ -1,6 +1,7 @@
-import { Handle, Position, useConnection, useInternalNode, useNodesData, Node, useReactFlow, applyNodeChanges, NodeChange } from '@xyflow/react';
+import { Handle, Position, useConnection, useNodesData, Node, useReactFlow, applyNodeChanges, NodeChange } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';
+import classNames from "classNames";
 
 export type SkillNodeData = {
     label: string;
@@ -12,7 +13,7 @@ type State = "available" | "unlocked" | "locked" | "detached";
 
 export function SkillNode({ id }: { id: string }): JSX.Element {
     const connection = useConnection();
-    // TODO: useCallback for onUnlock
+    // todo: useCallback for onUnlock?
     const { data: { label, description, state: nodeState } } = useNodesData<Node<SkillNodeData>>(id);
     const reactFlow = useReactFlow<Node<SkillNodeData>>();
 
@@ -32,6 +33,7 @@ export function SkillNode({ id }: { id: string }): JSX.Element {
             item: { ...node, data: { ...node.data, state: 'unlocked' } }
         }];
 
+        // todo: replace with getOutgoers
         const dependenIds: string[] = [];
         edges.forEach((edge) => {
             if (edge.source === id) {
@@ -49,7 +51,7 @@ export function SkillNode({ id }: { id: string }): JSX.Element {
                 item: {
                     ...node, data: {
                         ...node.data,
-                        state: "available"
+                        state: node.data.state === "unlocked" ? "unlocked" : "available"
                     }
                 }
             });
@@ -58,19 +60,13 @@ export function SkillNode({ id }: { id: string }): JSX.Element {
         reactFlow.setNodes(applyNodeChanges(changes, nodes));
     };
 
-    let className = 'skill-node';
-    if (nodeState === 'unlocked') {
-        className += ' skill-node-unlocked'
-    } else if (nodeState === 'locked') {
-        className += ' skill-node-locked'
-    } else if (nodeState === 'detached') {
-        className += ' skill-node-detached'
-    } else if (nodeState === 'available') {
-        className += ' skill-node-available'
-    }
-
     return (
-        <div className={`${className} racket-grid`}>
+        <div className={classNames("racket-grid", "skill-node", {
+            "skill-node-unlocked": nodeState === "unlocked",
+            "skill-node-locked": nodeState === "locked",
+            "skill-node-detached": nodeState === "detached",
+            "skill-node-available": nodeState === "available"
+        })}>
             <div className="skill-node-body">
                 {!connection.inProgress && (
                     <Handle
@@ -85,7 +81,7 @@ export function SkillNode({ id }: { id: string }): JSX.Element {
                         type="target"
                         id={`${id}-target`}
                         position={Position.Left}
-                        className="node-handle"
+                        className={classNames("node-handle", { "node-handle-invalid": !connection.isValid && id === connection.toNode?.id })}
                         isConnectableStart={false} />
                 )}
                 <NodeContent skillName={label} description={description} />
