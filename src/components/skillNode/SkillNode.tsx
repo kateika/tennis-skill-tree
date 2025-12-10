@@ -12,19 +12,19 @@ type Props = {
 const SkillNode: FC<Props> = ({ id }) => {
   const { unlockNode } = useContext(AppContext);
   const connection = useConnection();
-  const {
-    data: { label, description, state: nodeState },
-  } = useNodesData<SkillNode>(id);
+  const node = useNodesData<SkillNode>(id);
+
+  const { label, description, state } = node.data;
 
   // checking that it's not the node we started from
   const isPotentialTarget = connection.inProgress && connection.fromNode.id !== id;
   const isInvalidTarget = !connection.isValid && id === connection.toNode?.id;
-  const showUnlockBtn = nodeState === 'available' || nodeState === 'locked';
+  const showUnlockBtn = state === 'available' || state === 'locked';
 
   const onUnlock = () => unlockNode(id);
 
   return (
-    <div className={`racket-grid skill-node skill-node-${nodeState}`}>
+    <div className={`racket-grid skill-node skill-node-${state}`}>
       <div className="skill-node-body">
         {!connection.inProgress && (
           <Handle className="node-handle" position={Position.Right} type="source" id={`${id}-source`} />

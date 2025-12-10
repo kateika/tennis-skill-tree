@@ -26,7 +26,6 @@ export const hasCycle = (sourceId: string, targetId: string, state: State) => {
   return checkCycle(targetNode);
 };
 
-
 /**
  * Switches node to available unless it was previously unlocked.
  */

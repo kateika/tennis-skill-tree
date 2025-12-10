@@ -19,15 +19,7 @@ const Edge = ({ id, source, target, markerEnd, style }: EdgeProps) => {
     targetY: ty,
   });
 
-  return (
-    <BaseEdge
-      id={id}
-      className="react-flow__edge-path"
-      path={path}
-      markerEnd={markerEnd}
-      style={style}
-    />
-  );
-}
+  return <BaseEdge id={id} className="react-flow__edge-path" path={path} markerEnd={markerEnd} style={style} />;
+};
 
 export default Edge;
