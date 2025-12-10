@@ -7,14 +7,18 @@ import {
   applyEdgeChanges,
   addEdge,
   Connection,
+  getOutgoers,
 } from '@xyflow/react';
 import { defaultState } from './defaults';
+import { getNodeById, makeAvailable, makeLocked, makeUnlocked } from './helpers';
 export { Edge } from '@xyflow/react';
+
+export type SkillNodeState = 'available' | 'unlocked' | 'locked' | 'detached';
 
 type SkillNodeData = {
   label: string;
   description: string;
-  state: 'available' | 'unlocked' | 'locked' | 'detached';
+  state: SkillNodeState;
 };
 
 export type SkillNode = Node<SkillNodeData>;
@@ -44,12 +48,6 @@ export const reducer = (prevState: State, action: Action): State => {
       return defaultState;
     case 'STATE_LOADED':
       return action.state;
-    case 'ON_NODES_CHANGE': {
-      return { ...prevState, nodes: applyNodeChanges(action.changes, prevState.nodes) };
-    }
-    case 'ON_EDGES_CHANGE': {
-      return { ...prevState, edges: applyEdgeChanges(action.changes, prevState.edges) };
-    }
     case 'ADD_NODE': {
       const nodes = prevState.nodes;
       const { label, description } = action;
@@ -70,44 +68,15 @@ export const reducer = (prevState: State, action: Action): State => {
     case 'UNLOCK_NODE': {
       const id = action.id;
       const { nodes, edges } = prevState;
-      const node = nodes.find((n) => n.id === id);
-      if (!node) {
-        return prevState;
+      const node = getNodeById(id, prevState);
+
+      if (!node) return prevState;
+
+      const changes: NodeChange<SkillNode>[] = [makeUnlocked(node)];
+
+      for (const dependent of getOutgoers(node, nodes, edges)) {
+        changes.push(makeAvailable(dependent));
       }
-
-      const changes: NodeChange<SkillNode>[] = [
-        {
-          type: 'replace',
-          id,
-          item: { ...node, data: { ...node.data, state: 'unlocked' } },
-        },
-      ];
-
-      // todo: replace with getOutgoers
-      const dependenIds: string[] = [];
-      edges.forEach((edge) => {
-        if (edge.source === id) {
-          dependenIds.push(edge.target);
-        }
-      });
-
-      dependenIds.forEach((depId) => {
-        const node = nodes.find((n) => n.id === depId);
-        if (!node) {
-          return;
-        }
-        changes.push({
-          type: 'replace',
-          id: depId,
-          item: {
-            ...node,
-            data: {
-              ...node.data,
-              state: node.data.state === 'unlocked' ? 'unlocked' : 'available',
-            },
-          },
-        });
-      });
 
       return { ...prevState, nodes: applyNodeChanges(changes, nodes) };
     }
@@ -115,35 +84,27 @@ export const reducer = (prevState: State, action: Action): State => {
       const { nodes, edges } = prevState;
       const { source, target } = action.connection;
 
-      const sourceNode = nodes.find((n) => n.id === source);
-      const targetNode = nodes.find((n) => n.id === target);
-      const changes: NodeChange<SkillNode>[] = [];
+      const sourceNode = getNodeById(source, prevState);
+      const targetNode = getNodeById(target, prevState);
 
-      if (sourceNode && targetNode) {
-        // we don't want to set node to be "available" if it was already previously unlocked
-        const newTargetNodeState =
-          sourceNode.data.state === 'unlocked'
-            ? targetNode.data.state === 'unlocked'
-              ? 'unlocked'
-              : 'available'
-            : 'locked';
+      if (!sourceNode || !targetNode) return prevState;
 
-        changes.push({
-          type: 'replace',
-          id: targetNode.id,
-          item: { ...targetNode, data: { ...targetNode.data, state: newTargetNodeState } },
-        });
+      const isSourceUnlocked = sourceNode.data.state === 'unlocked';
 
-        if (sourceNode.data.state === 'detached') {
-          changes.push({
-            type: 'replace',
-            id: sourceNode.id,
-            item: { ...sourceNode, data: { ...sourceNode.data, state: 'available' } },
-          });
-        }
-      }
+      const changes: NodeChange<SkillNode>[] = [
+        makeAvailable(sourceNode),
+        isSourceUnlocked ? makeAvailable(targetNode) : makeLocked(targetNode),
+      ];
 
       return { ...prevState, edges: addEdge(action.connection, edges), nodes: applyNodeChanges(changes, nodes) };
+    }
+    case 'ON_NODES_CHANGE': {
+      // Needed to support React Flow controlled mode
+      return { ...prevState, nodes: applyNodeChanges(action.changes, prevState.nodes) };
+    }
+    case 'ON_EDGES_CHANGE': {
+      // Needed to support React Flow controlled mode
+      return { ...prevState, edges: applyEdgeChanges(action.changes, prevState.edges) };
     }
     default: {
       console.error('Unknown action', action);
