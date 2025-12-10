@@ -19,14 +19,13 @@ import {
 import '@xyflow/react/dist/style.css';
 import './App.scss';
 
-import { SkillNodeData } from '../skillNode/SkillNode';
 import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
 import { POSITION_SHIFT } from './constants';
-import { SkillTreeContext } from '@components/state/context';
+import { SkillTreeContext, SkillNode } from '@components/state';
 
-const initialNodes: Node<SkillNodeData>[] = [
+const initialNodes: SkillNode[] = [
   {
     id: '1',
     type: 'custom',
@@ -76,8 +75,8 @@ const initialEdges: Edge[] = [
 // todo: write unit tests
 // todo: ?record a video to attach to the Readme file?
 const App = () => {
-  const [nodes, setNodes] = useNodesState<Node<SkillNodeData>>(initialNodes);
-  const [edges, setEdges] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<SkillNode>(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect: OnConnect = useCallback(
     (newEdge) => {
@@ -86,7 +85,7 @@ const App = () => {
       setNodes((nodes) => {
         const sourceNode = nodes.find((n) => n.id === newEdge.source);
         const targetNode = nodes.find((n) => n.id === newEdge.target);
-        const changes: NodeChange<Node<SkillNodeData>>[] = [];
+        const changes: NodeChange<SkillNode>[] = [];
 
         if (sourceNode && targetNode) {
           // we don't want to set node to be "available" if it was already previously unlocked
@@ -171,7 +170,7 @@ const App = () => {
     const nextCoordinateY = (lastNode?.position.y ?? 0) + POSITION_SHIFT.y;
 
     // create and add a new node
-    const node: Node<SkillNodeData> = {
+    const node: SkillNode = {
       id: `n-${Date.now()}`,
       type: 'custom',
       position: { x: nextCoordinateX, y: nextCoordinateY },
@@ -187,7 +186,7 @@ const App = () => {
       return nodes;
     }
 
-    const changes: NodeChange<Node<SkillNodeData>>[] = [
+    const changes: NodeChange<SkillNode>[] = [
       {
         type: 'replace',
         id,
@@ -229,7 +228,9 @@ const App = () => {
       <SkillTreeContext.Provider value={{ addNode, unlockNode }}>
         <ReactFlow
           nodes={nodes}
+          onNodesChange={onNodesChange}
           edges={edges}
+          onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView
           nodeTypes={nodeTypes}
