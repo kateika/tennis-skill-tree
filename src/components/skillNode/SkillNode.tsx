@@ -29,7 +29,7 @@ const SkillNode: FC<Props> = ({ id }) => {
         {!connection.inProgress && (
           <Handle className="node-handle" position={Position.Right} type="source" id={`${id}-source`} />
         )}
-        {isPotentialTarget && (
+        {(!connection.inProgress || isPotentialTarget) && (
           <Handle
             type="target"
             id={`${id}-target`}
