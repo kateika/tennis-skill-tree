@@ -1,14 +1,10 @@
 import React, { useReducer } from 'react';
 import { useCallback, useEffect } from 'react';
 import {
-  addEdge,
-  applyNodeChanges,
   Background,
   Connection,
-  Edge,
   getOutgoers,
   Node,
-  NodeChange,
   OnConnect,
   OnEdgesChange,
   OnNodesChange,
@@ -22,51 +18,27 @@ import './App.scss';
 import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
-import { POSITION_SHIFT } from './constants';
-import { AppContext, defaultState, initialState, loadState, reducer, saveState, SkillNode } from '@components/state';
+import { AppContext, initialState, loadState, reducer, saveState, SkillNode } from '@components/state';
 
 // todo: final clean up (for example, to remove cypress files etc.)
 // todo: write unit tests
 // todo: ?record a video to attach to the Readme file?
 const App = () => {
-  const [{ nodes, edges }, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { nodes, edges } = state;
 
   const onNodesChange: OnNodesChange<SkillNode> = (changes) => dispatch({ type: 'ON_NODES_CHANGE', changes });
   const onEdgesChange: OnEdgesChange = (changes) => dispatch({ type: 'ON_EDGES_CHANGE', changes });
+  const onConnect: OnConnect = (connection) => dispatch({ type: 'CONNECT_NODES', connection });
+  const onReset = () => dispatch({ type: 'RESET' });
+  const addNode = (label: string, description: string) => dispatch({ type: 'ADD_NODE', label, description });
+  const unlockNode = (id: string) => dispatch({ type: 'UNLOCK_NODE', id });
 
-  // TODO: remove, this is temporary replacement to get to a working state
-  const setNodes = (nodes: SkillNode[]) => dispatch({type: "SET_NODES", nodes})
-  const setEdges = (edges: Edge[]) => dispatch({type: "SET_EDGES", edges})
+  // Restore app state on load or set up with initial nodes
+  useEffect(() => dispatch({ type: 'STATE_LOADED', state: loadState() }), []);
 
-  const onConnect: OnConnect = useCallback(
-    (newEdge) => {
-      setEdges(addEdge(newEdge, edges));
-
-      const sourceNode = nodes.find((n) => n.id === newEdge.source);
-      const targetNode = nodes.find((n) => n.id === newEdge.target);
-      const changes: NodeChange<SkillNode>[] = [];
-
-      if (sourceNode && targetNode) {
-        // we don't want to set node to be "available" if it was already previously unlocked
-        const newTargetNodeState = sourceNode.data.state === 'unlocked' ? (targetNode.data.state === "unlocked" ? "unlocked" : "available") : 'locked';
-
-        changes.push({
-          type: "replace",
-          id: targetNode.id,
-          item: { ...targetNode, data: { ...targetNode.data, state: newTargetNodeState } }
-        });
-
-        if (sourceNode.data.state === 'detached') {
-          changes.push({
-            type: "replace",
-            id: sourceNode.id,
-            item: { ...sourceNode, data: { ...sourceNode.data, state: 'available' } }
-          });
-        }
-      }
-
-      setNodes(applyNodeChanges(changes, nodes));
-    }, [setEdges, setNodes, nodes, edges]);
+  // Save on any change
+  useEffect(() => saveState(state), [state]);
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
@@ -93,83 +65,6 @@ const App = () => {
     },
     [nodes, edges],
   );
-
-  // Restore app state on load or set up with initial nodes
-  useEffect(() => {
-    const { nodes, edges } = loadState();
-    setNodes(nodes);
-    setEdges(edges);
-  }, []);
-
-  useEffect(() => {
-    saveState({ nodes, edges });
-  }, [nodes, edges]);
-
-  // todo: if I move the button to be a separate component, this logic should go there
-  const onReset = useCallback(() => {
-    const { nodes, edges } = defaultState;
-    setNodes(nodes);
-    setEdges(edges);
-  }, [setNodes, setEdges]);
-
-  const addNode = (label: string, description: string) => {
-    const lastNode = nodes[nodes.length - 1];
-    const nextCoordinateX = (lastNode?.position.x ?? 0) + POSITION_SHIFT.x;
-    const nextCoordinateY = (lastNode?.position.y ?? 0) + POSITION_SHIFT.y;
-
-    // create and add a new node
-    const node: SkillNode = {
-      id: `n-${Date.now()}`,
-      type: 'custom',
-      position: { x: nextCoordinateX, y: nextCoordinateY },
-      data: { label, description, state: 'detached' },
-    };
-
-    return setNodes([...nodes, node]);
-  };
-
-  const unlockNode = (id: string) => {
-    const node = nodes.find((n) => n.id === id);
-    if (!node) {
-      return nodes;
-    }
-
-    const changes: NodeChange<SkillNode>[] = [
-      {
-        type: 'replace',
-        id,
-        item: { ...node, data: { ...node.data, state: 'unlocked' } },
-      },
-    ];
-
-    // todo: replace with getOutgoers
-    const dependenIds: string[] = [];
-    edges.forEach((edge) => {
-      if (edge.source === id) {
-        dependenIds.push(edge.target);
-      }
-    });
-
-    dependenIds.forEach((depId) => {
-      const node = nodes.find((n) => n.id === depId);
-      if (!node) {
-        return;
-      }
-      changes.push({
-        type: 'replace',
-        id: depId,
-        item: {
-          ...node,
-          data: {
-            ...node.data,
-            state: node.data.state === 'unlocked' ? 'unlocked' : 'available',
-          },
-        },
-      });
-    });
-
-    setNodes(applyNodeChanges(changes, nodes));
-  };
 
   return (
     <main className="main-canvas">
