@@ -1,4 +1,5 @@
-import { Node } from '@xyflow/react';
+import { Node, Edge } from '@xyflow/react';
+export { Edge } from '@xyflow/react';
 
 type SkillNodeData = {
   label: string;
@@ -7,3 +8,8 @@ type SkillNodeData = {
 };
 
 export type SkillNode = Node<SkillNodeData>;
+
+export type State = {
+  nodes: SkillNode[],
+  edges: Edge[]
+}

@@ -23,60 +23,14 @@ import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
 import { POSITION_SHIFT } from './constants';
-import { AppContext, SkillNode } from '@components/state';
-
-const initialNodes: SkillNode[] = [
-  {
-    id: '1',
-    type: 'custom',
-    position: { x: POSITION_SHIFT.x, y: 0 },
-    data: {
-      label: 'Tennis Basics 1',
-      description: 'Learn the core strokes such as forehand and backhand.',
-      state: "available",
-    }
-  },
-  {
-    id: '2',
-    type: 'custom',
-    position: { x: POSITION_SHIFT.x, y: POSITION_SHIFT.y },
-    data: {
-      label: 'Tennis Basics 2',
-      description: 'Learn how to toss the ball and serve.',
-      state: "locked",
-    }
-  },
-  {
-    id: '3',
-    type: 'custom',
-    position: { x: POSITION_SHIFT.x, y: 2 * POSITION_SHIFT.y },
-    data: {
-      label: 'Tennis Basics 3',
-      description: 'Practice eye-ball coordination.',
-      state: "locked",
-    }
-  }
-]
-
-const initialEdges: Edge[] = [
-  {
-    id: "1-2",
-    source: "1",
-    target: "2"
-  },
-  {
-    id: "2-3",
-    source: "2",
-    target: "3"
-  }
-];
+import { AppContext, defaultState, loadState, saveState, SkillNode } from '@components/state';
 
 // todo: final clean up (for example, to remove cypress files etc.)
 // todo: write unit tests
 // todo: ?record a video to attach to the Readme file?
 const App = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<SkillNode>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<SkillNode>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const onConnect: OnConnect = useCallback(
     (newEdge) => {
@@ -139,29 +93,20 @@ const App = () => {
 
   // Restore app state on load or set up with initial nodes
   useEffect(() => {
-    const savedData = localStorage.getItem('skill-builder');
-    if (savedData) {
-      try {
-        const { nodes: savedNodes, edges: savedEdges } = JSON.parse(savedData);
-        setNodes(savedNodes);
-        setEdges(savedEdges);
-      } catch (error) {
-        console.error('Failed to load data from localStorage:', error);
-      }
-    } else {
-      setNodes(initialNodes);
-      setEdges(initialEdges);
-    }
+    const { nodes, edges } = loadState();
+    setNodes(nodes);
+    setEdges(edges);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('skill-builder', JSON.stringify({ nodes, edges }));
+    saveState({ nodes, edges });
   }, [nodes, edges]);
 
   // todo: if I move the button to be a separate component, this logic should go there
   const onReset = useCallback(() => {
-    setNodes(initialNodes);
-    setEdges(initialEdges);
+    const { nodes, edges } = defaultState;
+    setNodes(nodes);
+    setEdges(edges);
   }, [setNodes, setEdges]);
 
   const addNode = (label: string, description: string) => {
