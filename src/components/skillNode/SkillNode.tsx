@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Handle, Position, useConnection, useNodesData, Node, useReactFlow, applyNodeChanges, NodeChange } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';
 import classNames from "classNames";
+import { SkillTreeContext } from '@components/state/context';
 
 export type SkillNodeData = {
     label: string;
@@ -13,55 +14,19 @@ export type SkillNodeData = {
 type State = "available" | "unlocked" | "locked" | "detached";
 
 const SkillNode = ({ id }: { id: string }): JSX.Element => {
+    const { unlockNode } = useContext(SkillTreeContext);
     const connection = useConnection();
     // todo: useCallback for onUnlock?
     const { data: { label, description, state: nodeState } } = useNodesData<Node<SkillNodeData>>(id);
-    const reactFlow = useReactFlow<Node<SkillNodeData>>();
 
     // checking that it's not the node we started from
     const isTarget = connection.inProgress && connection.fromNode.id !== id;
 
     const onUnlock = () => {
-        const nodes = reactFlow.getNodes();
-        const edges = reactFlow.getEdges();
-
-        const node = nodes.find((n) => n.id === id);
-        if (!node) {
-            return nodes;
-        }
-
-        const changes: NodeChange<Node<SkillNodeData>>[] = [{
-            type: "replace", id,
-            item: { ...node, data: { ...node.data, state: 'unlocked' } }
-        }];
-
-        // todo: replace with getOutgoers
-        const dependenIds: string[] = [];
-        edges.forEach((edge) => {
-            if (edge.source === id) {
-                dependenIds.push(edge.target);
-            }
-        });
-
-        dependenIds.forEach((depId) => {
-            const node = nodes.find((n) => n.id === depId);
-            if (!node) {
-                return;
-            };
-            changes.push({
-                type: "replace", id: depId,
-                item: {
-                    ...node, data: {
-                        ...node.data,
-                        state: node.data.state === "unlocked" ? "unlocked" : "available"
-                    }
-                }
-            });
-        });
-
-        reactFlow.setNodes(applyNodeChanges(changes, nodes));
+      unlockNode(id);
     };
 
+    // TODO: replace with `skill-node-${nodeState}` for brevity
     return (
         <div className={classNames("racket-grid", "skill-node", {
             "skill-node-unlocked": nodeState === "unlocked",

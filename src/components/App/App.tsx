@@ -24,6 +24,7 @@ import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
 import { POSITION_SHIFT } from './constants';
+import { SkillTreeContext } from '@components/state/context';
 
 const initialNodes: Node<SkillNodeData>[] = [
   {
@@ -75,8 +76,8 @@ const initialEdges: Edge[] = [
 // todo: write unit tests
 // todo: ?record a video to attach to the Readme file?
 const App = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<SkillNodeData>>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes] = useNodesState<Node<SkillNodeData>>(initialNodes);
+  const [edges, setEdges] = useEdgesState(initialEdges);
 
   const onConnect: OnConnect = useCallback(
     (newEdge) => {
@@ -164,29 +165,90 @@ const App = () => {
     setEdges(initialEdges);
   }, [setNodes, setEdges]);
 
+  const addNode = (label: string, description: string) => {
+    const lastNode = nodes[nodes.length - 1];
+    const nextCoordinateX = (lastNode?.position.x ?? 0) + POSITION_SHIFT.x;
+    const nextCoordinateY = (lastNode?.position.y ?? 0) + POSITION_SHIFT.y;
+
+    // create and add a new node
+    const node: Node<SkillNodeData> = {
+      id: `n-${Date.now()}`,
+      type: 'custom',
+      position: { x: nextCoordinateX, y: nextCoordinateY },
+      data: { label, description, state: 'detached' },
+    };
+
+    return setNodes((nodes) => [...nodes, node]);
+  };
+
+  const unlockNode = (id: string) => {
+    const node = nodes.find((n) => n.id === id);
+    if (!node) {
+      return nodes;
+    }
+
+    const changes: NodeChange<Node<SkillNodeData>>[] = [
+      {
+        type: 'replace',
+        id,
+        item: { ...node, data: { ...node.data, state: 'unlocked' } },
+      },
+    ];
+
+    // todo: replace with getOutgoers
+    const dependenIds: string[] = [];
+    edges.forEach((edge) => {
+      if (edge.source === id) {
+        dependenIds.push(edge.target);
+      }
+    });
+
+    dependenIds.forEach((depId) => {
+      const node = nodes.find((n) => n.id === depId);
+      if (!node) {
+        return;
+      }
+      changes.push({
+        type: 'replace',
+        id: depId,
+        item: {
+          ...node,
+          data: {
+            ...node.data,
+            state: node.data.state === 'unlocked' ? 'unlocked' : 'available',
+          },
+        },
+      });
+    });
+
+    setNodes(applyNodeChanges(changes, nodes));
+  };
+
   return (
     <main className="main-canvas">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        defaultEdgeOptions={defaultEdgeOptions}
-        connectionLineComponent={NodeConnectionLine}
-        connectionLineStyle={connectionLineStyle}
-        isValidConnection={isValidConnection}
-        elementsSelectable={false}
-      >
-        <Background />
-        <Panel position="top-right">
-          <AddNodeForm />
-          <button type="button" className='clear-button' onClick={onReset}>Reset skill tree</button>
-        </Panel>
-      </ReactFlow>
+      <SkillTreeContext.Provider value={{ addNode, unlockNode }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onConnect={onConnect}
+          fitView
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={NodeConnectionLine}
+          connectionLineStyle={connectionLineStyle}
+          isValidConnection={isValidConnection}
+          elementsSelectable={false}
+        >
+          <Background />
+          <Panel position="top-right">
+            <AddNodeForm />
+            <button type="button" className="clear-button" onClick={onReset}>
+              Reset skill tree
+            </button>
+          </Panel>
+        </ReactFlow>
+      </SkillTreeContext.Provider>
     </main>
   );
 };
