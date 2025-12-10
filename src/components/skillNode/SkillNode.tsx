@@ -12,12 +12,13 @@ export type SkillNodeData = {
 
 type State = "available" | "unlocked" | "locked" | "detached";
 
-export function SkillNode({ id }: { id: string }): JSX.Element {
+const SkillNode = ({ id }: { id: string }): JSX.Element => {
     const connection = useConnection();
     // todo: useCallback for onUnlock?
     const { data: { label, description, state: nodeState } } = useNodesData<Node<SkillNodeData>>(id);
     const reactFlow = useReactFlow<Node<SkillNodeData>>();
 
+    // checking that it's not the node we started from
     const isTarget = connection.inProgress && connection.fromNode.id !== id;
 
     const onUnlock = () => {
@@ -93,3 +94,4 @@ export function SkillNode({ id }: { id: string }): JSX.Element {
     );
 }
 
+export default SkillNode;

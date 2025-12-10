@@ -1,4 +1,4 @@
-import { SkillNode } from '../skillNode/SkillNode';
+import SkillNode from '../skillNode/SkillNode';
 import Edge from '../edge/Edge';
 import { MarkerType } from '@xyflow/react';
 

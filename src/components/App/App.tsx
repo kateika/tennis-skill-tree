@@ -73,6 +73,7 @@ const initialEdges: Edge[] = [
 
 // todo: final clean up (for example, to remove cypress files etc.)
 // todo: write unit tests
+// todo: ?record a video to attach to the Readme file?
 const App = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<SkillNodeData>>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -87,6 +88,7 @@ const App = () => {
         const changes: NodeChange<Node<SkillNodeData>>[] = [];
 
         if (sourceNode && targetNode) {
+          // we don't want to set node to be "available" if it was already previously unlocked
           const newTargetNodeState = sourceNode.data.state === 'unlocked' ? (targetNode.data.state === "unlocked" ? "unlocked" : "available") : 'locked';
 
           changes.push({
@@ -116,12 +118,13 @@ const App = () => {
       const target = nodes.find((node) => node.id === connection.target);
 
       const hasCycle = (node: Node, visited = new Set()) => {
-        // Early return if we have processed this subtree
+        // Early return if we have processed this subtree previously
         if (visited.has(node.id)) return false;
 
         visited.add(node.id);
 
         for (const dependent of getOutgoers(node, nodes, edges)) {
+          // todo: comment a complex logic as requested
           if (dependent.id === connection.source) return true;
           if (hasCycle(dependent, visited)) return true;
         }
@@ -155,6 +158,7 @@ const App = () => {
     localStorage.setItem('skill-builder', JSON.stringify({ nodes, edges }));
   }, [nodes, edges]);
 
+  // todo: if I move the button to be a separate component, this logic should go there
   const onReset = useCallback(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
