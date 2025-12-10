@@ -31,8 +31,8 @@ const initialNodes: Node<SkillNodeData>[] = [
     type: 'custom',
     position: { x: POSITION_SHIFT.x, y: 0 },
     data: {
-      label: 'Tennis Basics',
-      description: 'Learn the basic  and techniques of tennis.',
+      label: 'Tennis Basics 1',
+      description: 'Learn the core strokes such as forehand and backhand.',
       state: "available",
     }
   },
@@ -42,7 +42,7 @@ const initialNodes: Node<SkillNodeData>[] = [
     position: { x: POSITION_SHIFT.x, y: POSITION_SHIFT.y },
     data: {
       label: 'Tennis Basics 2',
-      description: 'Learn the core strokes.',
+      description: 'Learn how to toss the ball and serve.',
       state: "locked",
     }
   },
