@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { useCallback, useEffect } from 'react';
 import {
   addEdge,
@@ -10,10 +10,10 @@ import {
   Node,
   NodeChange,
   OnConnect,
+  OnEdgesChange,
+  OnNodesChange,
   Panel,
   ReactFlow,
-  useEdgesState,
-  useNodesState
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -23,47 +23,50 @@ import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
 import { POSITION_SHIFT } from './constants';
-import { AppContext, defaultState, loadState, saveState, SkillNode } from '@components/state';
+import { AppContext, defaultState, initialState, loadState, reducer, saveState, SkillNode } from '@components/state';
 
 // todo: final clean up (for example, to remove cypress files etc.)
 // todo: write unit tests
 // todo: ?record a video to attach to the Readme file?
 const App = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<SkillNode>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [{ nodes, edges }, dispatch] = useReducer(reducer, initialState);
+
+  const onNodesChange: OnNodesChange<SkillNode> = (changes) => dispatch({ type: 'ON_NODES_CHANGE', changes });
+  const onEdgesChange: OnEdgesChange = (changes) => dispatch({ type: 'ON_EDGES_CHANGE', changes });
+
+  // TODO: remove, this is temporary replacement to get to a working state
+  const setNodes = (nodes: SkillNode[]) => dispatch({type: "SET_NODES", nodes})
+  const setEdges = (edges: Edge[]) => dispatch({type: "SET_EDGES", edges})
 
   const onConnect: OnConnect = useCallback(
     (newEdge) => {
-      setEdges((edges) => addEdge(newEdge, edges));
+      setEdges(addEdge(newEdge, edges));
 
-      setNodes((nodes) => {
-        const sourceNode = nodes.find((n) => n.id === newEdge.source);
-        const targetNode = nodes.find((n) => n.id === newEdge.target);
-        const changes: NodeChange<SkillNode>[] = [];
+      const sourceNode = nodes.find((n) => n.id === newEdge.source);
+      const targetNode = nodes.find((n) => n.id === newEdge.target);
+      const changes: NodeChange<SkillNode>[] = [];
 
-        if (sourceNode && targetNode) {
-          // we don't want to set node to be "available" if it was already previously unlocked
-          const newTargetNodeState = sourceNode.data.state === 'unlocked' ? (targetNode.data.state === "unlocked" ? "unlocked" : "available") : 'locked';
+      if (sourceNode && targetNode) {
+        // we don't want to set node to be "available" if it was already previously unlocked
+        const newTargetNodeState = sourceNode.data.state === 'unlocked' ? (targetNode.data.state === "unlocked" ? "unlocked" : "available") : 'locked';
 
+        changes.push({
+          type: "replace",
+          id: targetNode.id,
+          item: { ...targetNode, data: { ...targetNode.data, state: newTargetNodeState } }
+        });
+
+        if (sourceNode.data.state === 'detached') {
           changes.push({
             type: "replace",
-            id: targetNode.id,
-            item: { ...targetNode, data: { ...targetNode.data, state: newTargetNodeState } }
+            id: sourceNode.id,
+            item: { ...sourceNode, data: { ...sourceNode.data, state: 'available' } }
           });
-
-          if (sourceNode.data.state === 'detached') {
-            changes.push({
-              type: "replace",
-              id: sourceNode.id,
-              item: { ...sourceNode, data: { ...sourceNode.data, state: 'available' } }
-            });
-          }
         }
+      }
 
-        return applyNodeChanges(changes, nodes);
-      });
-
-    }, [setEdges, setNodes, nodes]);
+      setNodes(applyNodeChanges(changes, nodes));
+    }, [setEdges, setNodes, nodes, edges]);
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
@@ -122,7 +125,7 @@ const App = () => {
       data: { label, description, state: 'detached' },
     };
 
-    return setNodes((nodes) => [...nodes, node]);
+    return setNodes([...nodes, node]);
   };
 
   const unlockNode = (id: string) => {
