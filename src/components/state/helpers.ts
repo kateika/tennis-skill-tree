@@ -6,7 +6,6 @@ export const getNodeById = (id: string, state: State): SkillNode | null => {
 };
 
 export const hasCycle = (sourceId: string, targetId: string, state: State) => {
-  if (sourceId === targetId) return true;
   const targetNode = getNodeById(targetId, state);
 
   const checkCycle = (node: SkillNode, visited = new Set()) => {
@@ -24,7 +23,7 @@ export const hasCycle = (sourceId: string, targetId: string, state: State) => {
     return false;
   };
 
-  return !checkCycle(targetNode);
+  return checkCycle(targetNode);
 };
 
 
