@@ -10,4 +10,4 @@ const defaultContext: Context = {
   addNode: () => console.trace('addNode is not implemented'),
 };
 
-export const SkillTreeContext = createContext(defaultContext);
+export const AppContext = createContext(defaultContext);

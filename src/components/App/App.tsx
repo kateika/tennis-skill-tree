@@ -23,7 +23,7 @@ import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
 import { POSITION_SHIFT } from './constants';
-import { SkillTreeContext, SkillNode } from '@components/state';
+import { AppContext, SkillNode } from '@components/state';
 
 const initialNodes: SkillNode[] = [
   {
@@ -225,7 +225,7 @@ const App = () => {
 
   return (
     <main className="main-canvas">
-      <SkillTreeContext.Provider value={{ addNode, unlockNode }}>
+      <AppContext.Provider value={{ addNode, unlockNode }}>
         <ReactFlow
           nodes={nodes}
           onNodesChange={onNodesChange}
@@ -249,7 +249,7 @@ const App = () => {
             </button>
           </Panel>
         </ReactFlow>
-      </SkillTreeContext.Provider>
+      </AppContext.Provider>
     </main>
   );
 };

@@ -3,14 +3,14 @@ import { Handle, Position, useConnection, useNodesData } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';
 import classNames from 'classNames';
-import { SkillTreeContext, SkillNode } from '@components/state';
+import { AppContext, SkillNode } from '@components/state';
 
 type Props = {
   id: string;
 };
 
 const SkillNode: FC<Props> = ({ id }) => {
-  const { unlockNode } = useContext(SkillTreeContext);
+  const { unlockNode } = useContext(AppContext);
   const connection = useConnection();
   const {
     data: { label, description, state: nodeState },
@@ -51,4 +51,3 @@ const SkillNode: FC<Props> = ({ id }) => {
 };
 
 export default SkillNode;
-

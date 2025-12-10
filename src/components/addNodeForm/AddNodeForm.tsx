@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
 import './addNodeForm.scss';
 import { FC, useState, FormEvent } from 'react';
-import { SkillTreeContext } from '@components/state/context';
+import { AppContext } from '@components/state/context';
 
 const AddNodeForm: FC = () => {
     const [hasFormError, setHasFormError] = useState(false);
     const [label, setLabel] = useState('');
     const [description, setDescription] = useState('');
 
-    const { addNode } = useContext(SkillTreeContext);
+    const { addNode } = useContext(AppContext);
 
     const onSubmit = (e: FormEvent) => {
         e.preventDefault();
