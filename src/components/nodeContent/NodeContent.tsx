@@ -1,4 +1,3 @@
-import React from 'react';
 import './nodeContent.scss';
 
 const NodeContent = ({ skillName, description }: { skillName: string; description: string }) => {

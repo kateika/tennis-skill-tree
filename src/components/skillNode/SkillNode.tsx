@@ -1,4 +1,4 @@
-import React, { FC, useContext } from 'react';
+import { FC, useContext } from 'react';
 import { Handle, Position, useConnection, useNodesData } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';
@@ -25,7 +25,13 @@ const SkillNode: FC<Props> = ({ id }) => {
     <div className={`racket-grid skill-node skill-node-${state}`}>
       <div className="skill-node-body">
         {!connection.inProgress && (
-          <Handle className="node-handle" data-testid={`${id}-source-handle}`} position={Position.Right} type="source" id={`${id}-source`} />
+          <Handle
+            className="node-handle"
+            data-testid={`${id}-source-handle}`}
+            position={Position.Right}
+            type="source"
+            id={`${id}-source`}
+          />
         )}
         {(!connection.inProgress || isPotentialTarget) && (
           <Handle
@@ -39,7 +45,12 @@ const SkillNode: FC<Props> = ({ id }) => {
         )}
         <NodeContent skillName={label} description={description} />
         {showUnlockBtn && (
-          <button type="button" className="unlock-skill-button" data-testid={`unlock-button-for-${id}`} onClick={() => unlockNode(id)}>
+          <button
+            type="button"
+            className="unlock-skill-button"
+            data-testid={`unlock-button-for-${id}`}
+            onClick={() => unlockNode(id)}
+          >
             Unlock
           </button>
         )}

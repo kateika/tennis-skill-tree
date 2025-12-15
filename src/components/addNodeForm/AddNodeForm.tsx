@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import './addNodeForm.scss';
 import { FC, useState, FormEvent } from 'react';
 import { AppContext } from '@components/state/context';

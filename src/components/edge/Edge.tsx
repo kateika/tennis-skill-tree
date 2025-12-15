@@ -1,4 +1,3 @@
-import React from 'react';
 import { BaseEdge, EdgeProps, getStraightPath, useInternalNode } from '@xyflow/react';
 import { getEdgeParams } from './edgeCalc';
 

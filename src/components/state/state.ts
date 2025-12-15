@@ -88,7 +88,7 @@ export const reducer = (prevState: State, action: Action): State => {
       const targetNode = getNodeById(target, prevState);
 
       if (!sourceNode || !targetNode) return prevState;
-      
+
       const isSourceUnlocked = sourceNode.data.state === 'unlocked';
 
       const changes: NodeChange<SkillNode>[] = [

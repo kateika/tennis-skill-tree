@@ -15,14 +15,12 @@ module.exports = {
   plugins: ['css-modules'],
   extends: [
     'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
     'plugin:css-modules/recommended',
     'plugin:prettier/recommended',
   ],
   rules: {
-    'prettier/indent': 'off',
-    indent: ['error', 2],
     'react/display-name': 'off',
   },
 };
