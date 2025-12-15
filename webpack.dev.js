@@ -49,7 +49,7 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     compress: true,
-    port: 8080,
+    port: 3333,
     open: true,
   },
   plugins: [
