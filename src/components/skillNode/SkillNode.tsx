@@ -2,7 +2,7 @@ import { FC, useContext } from 'react';
 import { Handle, Position, useConnection, useNodesData } from '@xyflow/react';
 import './skillNode.scss';
 import NodeContent from '../nodeContent/NodeContent';
-import classNames from 'classNames';
+import classNames from 'classnames';
 import { AppContext, SkillNode } from '@components/state';
 
 type Props = {
