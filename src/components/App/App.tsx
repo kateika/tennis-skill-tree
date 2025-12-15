@@ -18,7 +18,6 @@ import AddNodeForm from '../addNodeForm/AddNodeForm';
 import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './reactFlowConfig';
 import { AppContext, hasCycle, initialState, loadState, reducer, saveState, SkillNode } from '@components/state';
 
-// todo: final clean up (for example, to remove cypress files etc.)
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
