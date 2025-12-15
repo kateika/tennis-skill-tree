@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NodeContent should render just description if skill is not passed 1`] = `
+<DocumentFragment>
+  <article
+    class="node-content"
+  >
+    <p
+      class="skill-description"
+    >
+      Random description
+    </p>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`NodeContent should render just skill if description is not passed 1`] = `
+<DocumentFragment>
+  <article
+    class="node-content"
+  >
+    <span
+      class="skill-name"
+    >
+      Random skill
+    </span>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`NodeContent should render skill and description if we have them both 1`] = `
+<DocumentFragment>
+  <article
+    class="node-content"
+  >
+    <span
+      class="skill-name"
+    >
+      Random skill
+    </span>
+    <p
+      class="skill-description"
+    >
+      Random description
+    </p>
+  </article>
+</DocumentFragment>
+`;

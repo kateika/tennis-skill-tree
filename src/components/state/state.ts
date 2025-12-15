@@ -10,7 +10,7 @@ import {
   getOutgoers,
 } from '@xyflow/react';
 import { defaultState } from './defaults';
-import { getNodeById, makeAvailable, makeLocked, makeUnlocked } from './helpers';
+import { getDescendants, getNodeById, makeAvailable, makeLocked, makeUnlocked } from './helpers';
 export { Edge } from '@xyflow/react';
 
 export type SkillNodeState = 'available' | 'unlocked' | 'locked' | 'detached';
@@ -88,12 +88,13 @@ export const reducer = (prevState: State, action: Action): State => {
       const targetNode = getNodeById(target, prevState);
 
       if (!sourceNode || !targetNode) return prevState;
-
+      
       const isSourceUnlocked = sourceNode.data.state === 'unlocked';
 
       const changes: NodeChange<SkillNode>[] = [
         makeAvailable(sourceNode),
         isSourceUnlocked ? makeAvailable(targetNode) : makeLocked(targetNode),
+        ...getDescendants(targetNode, prevState).map((n) => makeLocked(n)),
       ];
 
       return { ...prevState, edges: addEdge(action.connection, edges), nodes: applyNodeChanges(changes, nodes) };

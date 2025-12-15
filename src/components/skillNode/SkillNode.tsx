@@ -21,18 +21,17 @@ const SkillNode: FC<Props> = ({ id }) => {
   const isInvalidTarget = !connection.isValid && id === connection.toNode?.id;
   const showUnlockBtn = state === 'available' || state === 'locked';
 
-  const onUnlock = () => unlockNode(id);
-
   return (
     <div className={`racket-grid skill-node skill-node-${state}`}>
       <div className="skill-node-body">
         {!connection.inProgress && (
-          <Handle className="node-handle" position={Position.Right} type="source" id={`${id}-source`} />
+          <Handle className="node-handle" data-testid={`${id}-source-handle}`} position={Position.Right} type="source" id={`${id}-source`} />
         )}
         {(!connection.inProgress || isPotentialTarget) && (
           <Handle
             type="target"
             id={`${id}-target`}
+            data-testid={`${id}-target-handle}`}
             position={Position.Left}
             className={classNames('node-handle', { 'node-handle-invalid': isInvalidTarget })}
             isConnectableStart={false}
@@ -40,7 +39,7 @@ const SkillNode: FC<Props> = ({ id }) => {
         )}
         <NodeContent skillName={label} description={description} />
         {showUnlockBtn && (
-          <button type="button" className="unlock-skill-button" onClick={onUnlock}>
+          <button type="button" className="unlock-skill-button" data-testid={`unlock-button-for-${id}`} onClick={() => unlockNode(id)}>
             Unlock
           </button>
         )}

@@ -8,22 +8,34 @@ export const getNodeById = (id: string, state: State): SkillNode | null => {
 export const hasCycle = (sourceId: string, targetId: string, state: State) => {
   const targetNode = getNodeById(targetId, state);
 
-  const checkCycle = (node: SkillNode, visited = new Set()) => {
+  const checkCycle = (node: SkillNode, visited = new Set()): boolean => {
     // Early return if we have processed this subtree previously
     if (visited.has(node.id)) return false;
 
     visited.add(node.id);
 
-    for (const dependent of getOutgoers(node, state.nodes, state.edges)) {
-      // todo: comment a complex logic as requested
-      if (dependent.id === sourceId) return true;
-      if (checkCycle(dependent, visited)) return true;
+    for (const child of getOutgoers(node, state.nodes, state.edges)) {
+      if (child.id === sourceId) return true;
+      if (checkCycle(child, visited)) return true;
     }
 
     return false;
   };
 
   return checkCycle(targetNode);
+};
+
+/**
+ * Return all descendants of a target node.
+ */
+export const getDescendants = (node: SkillNode, state: State): SkillNode[] => {
+  const descendants: SkillNode[] = [];
+
+  for (const child of getOutgoers(node, state.nodes, state.edges)) {
+    descendants.push(child, ...getDescendants(child, state));
+  }
+
+  return descendants;
 };
 
 /**

@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import { useReducer } from 'react';
 import { useCallback, useEffect } from 'react';
 import {
   Background,
@@ -15,12 +15,10 @@ import './App.scss';
 
 import NodeConnectionLine from '../nodeConnectionLine/NodeConnectionLine';
 import AddNodeForm from '../addNodeForm/AddNodeForm';
-import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './setup';
+import { connectionLineStyle, defaultEdgeOptions, nodeTypes, edgeTypes } from './reactFlowConfig';
 import { AppContext, hasCycle, initialState, loadState, reducer, saveState, SkillNode } from '@components/state';
 
 // todo: final clean up (for example, to remove cypress files etc.)
-// todo: write unit tests
-// todo: ?record a video to attach to the Readme file?
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 

@@ -21,4 +21,3 @@ export const defaultEdgeOptions = {
     color: '#b1b1b7',
   },
 };
-

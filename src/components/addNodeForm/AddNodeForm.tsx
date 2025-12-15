@@ -57,7 +57,11 @@ const AddNodeForm: FC = () => {
         </span>
       </div>
 
-      {hasFormError && <p className="form-error">Please fill in a skill</p>}
+      {hasFormError && (
+        <p className="form-error" data-testid="skill-form-error">
+          Please fill in a skill
+        </p>
+      )}
       <button type="submit" className="form-button">
         Add Node
       </button>

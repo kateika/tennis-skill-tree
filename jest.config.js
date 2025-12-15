@@ -1,5 +1,6 @@
 module.exports = {
   roots: ['<rootDir>'],
+  testEnvironment: 'jsdom',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
   moduleNameMapper: {
     '\\.scss$': 'identity-obj-proxy',
