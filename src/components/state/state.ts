@@ -10,13 +10,7 @@ import {
   getOutgoers,
 } from '@xyflow/react';
 import { defaultState } from './defaults';
-import {
-  getNodeById,
-  makeAvailable,
-  makeUnlocked,
-  replaceNodeState,
-  capSubtreeState,
-} from './helpers';
+import { getNodeById, makeAvailable, makeUnlocked, replaceNodeState, capSubtreeState } from './helpers';
 export { Edge } from '@xyflow/react';
 
 export type SkillNodeState = 'available' | 'unlocked' | 'locked' | 'detached';
