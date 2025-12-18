@@ -114,6 +114,7 @@ describe('state', () => {
             { id: 'e-2', source: 'n-1', target: 'n-3' },
           ],
         };
+
         const action: Action = { type: 'UNLOCK_NODE', id: 'n-1' };
         const result = reducer(initialState, action);
 
@@ -124,35 +125,34 @@ describe('state', () => {
     });
 
     describe('CONNECT_NODES', () => {
-      const node1: SkillNode = {
-        id: 'n-1',
-        type: 'custom',
-        position: { x: 0, y: 100 },
-        data: {
-          label: 'test1',
-          description: 'node1',
-          state: 'detached',
-        },
-      };
+      it('should connect two detached nodes and make source available and target locked', () => {
+        const node1: SkillNode = {
+          id: 'n-1',
+          type: 'custom',
+          position: { x: 0, y: 100 },
+          data: {
+            label: 'test1',
+            description: 'node1',
+            state: 'detached',
+          },
+        };
 
-      const node2: SkillNode = {
-        id: 'n-2',
-        type: 'custom',
-        position: { x: 100, y: 100 },
-        data: {
-          label: 'test2',
-          description: 'node2',
-          state: 'detached',
-        },
-      };
+        const node2: SkillNode = {
+          id: 'n-2',
+          type: 'custom',
+          position: { x: 100, y: 100 },
+          data: {
+            label: 'test2',
+            description: 'node2',
+            state: 'detached',
+          },
+        };
 
-      it('should connect two nodes and make target available when source is unlocked', () => {
-        const unlockedNode1: SkillNode = { ...node1, data: { ...node1.data, state: 'unlocked' } };
-        const initialState: State = { nodes: [unlockedNode1, node2], edges: [] };
+        const initialState: State = { nodes: [node1, node2], edges: [] };
         const action: Action = {
           type: 'CONNECT_NODES',
           connection: {
-            source: unlockedNode1.id,
+            source: node1.id,
             target: node2.id,
             sourceHandle: 'whatever',
             targetHandle: 'whatever',
@@ -161,11 +161,86 @@ describe('state', () => {
         const result = reducer(initialState, action);
 
         expect(result.edges).toHaveLength(1);
+        expect(result.nodes[0].data.state).toBe('available');
+        expect(result.nodes[1].data.state).toBe('locked');
+      });
+
+      it('should connect two nodes and make target available when source is unlocked', () => {
+        const node1: SkillNode = {
+          id: 'n-1',
+          type: 'custom',
+          position: { x: 0, y: 100 },
+          data: {
+            label: 'test1',
+            description: 'node1',
+            state: 'unlocked',
+          },
+        };
+
+        const node2: SkillNode = {
+          id: 'n-2',
+          type: 'custom',
+          position: { x: 100, y: 100 },
+          data: {
+            label: 'test2',
+            description: 'node2',
+            state: 'available',
+          },
+        };
+
+        const node3: SkillNode = {
+          id: 'n-3',
+          type: 'custom',
+          position: { x: 100, y: 200 },
+          data: {
+            label: 'test3',
+            description: 'node3',
+            state: 'detached',
+          },
+        };
+
+        const edges = [{ id: '1-2', source: 'n-1', target: 'n-2' }];
+
+        const initialState: State = { nodes: [node1, node2, node3], edges };
+        const action: Action = {
+          type: 'CONNECT_NODES',
+          connection: {
+            source: node1.id,
+            target: node3.id,
+            sourceHandle: 'whatever',
+            targetHandle: 'whatever',
+          },
+        };
+        const result = reducer(initialState, action);
+
         expect(result.nodes[0].data.state).toBe('unlocked');
         expect(result.nodes[1].data.state).toBe('available');
+        expect(result.nodes[2].data.state).toBe('available');
       });
 
       it('should not connect nodes if source or target does not exist', () => {
+        const node1: SkillNode = {
+          id: 'n-1',
+          type: 'custom',
+          position: { x: 0, y: 100 },
+          data: {
+            label: 'test1',
+            description: 'node1',
+            state: 'detached',
+          },
+        };
+
+        const node2: SkillNode = {
+          id: 'n-2',
+          type: 'custom',
+          position: { x: 100, y: 100 },
+          data: {
+            label: 'test2',
+            description: 'node2',
+            state: 'detached',
+          },
+        };
+
         const initialState: State = { nodes: [node1, node2], edges: [] };
         const action: Action = {
           type: 'CONNECT_NODES',
@@ -250,6 +325,54 @@ describe('state', () => {
         expect(result.nodes[2].data.state).toBe('locked');
       });
 
+      it('should keep dependents unlocked when connecting to unlocked tree', () => {
+        const node1: SkillNode = {
+          id: 'n-1',
+          type: 'custom',
+          position: { x: 0, y: 100 },
+          data: { label: 'test1', description: 'node1', state: 'unlocked' },
+        };
+
+        const node2: SkillNode = {
+          id: 'n-2',
+          type: 'custom',
+          position: { x: 100, y: 100 },
+          data: { label: 'test2', description: 'node2', state: 'unlocked' },
+        };
+
+        const node3: SkillNode = {
+          id: 'n-3',
+          type: 'custom',
+          position: { x: 200, y: 100 },
+          data: { label: 'test3', description: 'node3', state: 'unlocked' },
+        };
+
+        const node4: SkillNode = {
+          id: 'n-4',
+          type: 'custom',
+          position: { x: 300, y: 100 },
+          data: { label: 'test4', description: 'node4', state: 'unlocked' },
+        };
+
+        const initialState: State = {
+          nodes: [node1, node2, node3, node4],
+          edges: [
+            { id: 'e-1', source: 'n-1', target: 'n-2' },
+            { id: 'e-2', source: 'n-3', target: 'n-4' },
+          ],
+        };
+
+        const action: Action = {
+          type: 'CONNECT_NODES',
+          connection: { source: 'n-1', target: 'n-3', sourceHandle: 'a', targetHandle: 'b' },
+        };
+        const result = reducer(initialState, action);
+
+        expect(result.nodes[0].data.state).toBe('unlocked');
+        expect(result.nodes[1].data.state).toBe('unlocked');
+        expect(result.nodes[2].data.state).toBe('unlocked');
+        expect(result.nodes[3].data.state).toBe('unlocked');
+      });
       it('should keep unlocked state of the parent node if the node is added to the middle of the tree', () => {
         const node1: SkillNode = {
           id: 'n-1',
@@ -300,14 +423,14 @@ describe('state', () => {
         };
         const state = reducer(initialState, action);
 
-        expect(getNodeById("n-1", state).data.state).toBe('unlocked');
-        expect(getNodeById("middle-node", state).data.state).toBe('available');
-        expect(getNodeById("n-2", state).data.state).toBe('locked');
-        expect(getNodeById("n-3", state).data.state).toBe('locked');
-        expect(getNodeById("n-4", state).data.state).toBe('locked');
+        expect(getNodeById('n-1', state).data.state).toBe('unlocked');
+        expect(getNodeById('middle-node', state).data.state).toBe('available');
+        expect(getNodeById('n-2', state).data.state).toBe('locked');
+        expect(getNodeById('n-3', state).data.state).toBe('locked');
+        expect(getNodeById('n-4', state).data.state).toBe('locked');
       });
 
-      it('should remain existing state of all parents if node is added after the last node', () => {
+      it('should keep the parent as available if a detached node is added to it', () => {
         const node1: SkillNode = {
           id: 'n-1',
           type: 'custom',
@@ -340,9 +463,46 @@ describe('state', () => {
         };
         const result = reducer(initialState, action);
 
-        /**expected failure due to the bag in state.ts */
         expect(result.nodes[0].data.state).toBe('unlocked');
         expect(result.nodes[1].data.state).toBe('available');
+        expect(result.nodes[2].data.state).toBe('locked');
+      });
+
+      it('should keep the parent as locked if a detached node is added to it', () => {
+        const node1: SkillNode = {
+          id: 'n-1',
+          type: 'custom',
+          position: { x: 0, y: 100 },
+          data: { label: 'test1', description: 'node1', state: 'available' },
+        };
+
+        const node2: SkillNode = {
+          id: 'n-2',
+          type: 'custom',
+          position: { x: 100, y: 100 },
+          data: { label: 'test2', description: 'node2', state: 'locked' },
+        };
+
+        const node3: SkillNode = {
+          id: 'n-3',
+          type: 'custom',
+          position: { x: 200, y: 100 },
+          data: { label: 'test3', description: 'node3', state: 'detached' },
+        };
+
+        const initialState: State = {
+          nodes: [node1, node2, node3],
+          edges: [{ id: 'e-1', source: 'n-1', target: 'n-2' }],
+        };
+
+        const action: Action = {
+          type: 'CONNECT_NODES',
+          connection: { source: 'n-2', target: 'n-3', sourceHandle: 'a', targetHandle: 'b' },
+        };
+        const result = reducer(initialState, action);
+
+        expect(result.nodes[0].data.state).toBe('available');
+        expect(result.nodes[1].data.state).toBe('locked');
         expect(result.nodes[2].data.state).toBe('locked');
       });
     });

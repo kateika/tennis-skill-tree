@@ -6,6 +6,8 @@ export const getNodeById = (id: string, state: State): SkillNode | null => {
 };
 
 export const hasCycle = (sourceId: string, targetId: string, state: State) => {
+  if (sourceId === targetId) return true;
+
   const targetNode = getNodeById(targetId, state);
 
   const checkCycle = (node: SkillNode, visited = new Set()): boolean => {
@@ -26,32 +28,50 @@ export const hasCycle = (sourceId: string, targetId: string, state: State) => {
 };
 
 /**
- * Return all descendants of a target node.
+ * Limit node state to parent node state enforcing the hierarchy: a child
+ * cannot have a state "higher" than its parent.
  */
-export const getDescendants = (node: SkillNode, state: State): SkillNode[] => {
-  const descendants: SkillNode[] = [];
-
-  for (const child of getOutgoers(node, state.nodes, state.edges)) {
-    descendants.push(child, ...getDescendants(child, state));
+export const capNodeStateTo = (nodeState: SkillNodeState, parentNodeState: SkillNodeState): SkillNodeState => {
+  switch (parentNodeState) {
+    case 'unlocked':
+      // both child and parent can be unlocked
+      return nodeState === 'unlocked' ? 'unlocked' : 'available';
+    case 'available':
+      return 'locked';
+    default:
+      return 'locked';
   }
-
-  return descendants;
 };
 
 /**
- * Switches node to available unless it was previously unlocked.
+ * Returns an array of `NodeChange` updating the subtree that starts at `node`
+ * by capping its state to `parentNodeState`.
  */
+export const capSubtreeState = (
+  node: SkillNode,
+  parentNodeState: SkillNodeState,
+  graphState: State,
+): NodeChange<SkillNode>[] => {
+  const nodeState = capNodeStateTo(node.data.state, parentNodeState);
+
+  const changes: NodeChange<SkillNode>[] = [replaceNodeState(node, nodeState)];
+
+  for (const child of getOutgoers(node, graphState.nodes, graphState.edges)) {
+    changes.push(...capSubtreeState(child, nodeState, graphState));
+  }
+
+  return changes;
+};
+
 export const makeAvailable = (node: SkillNode): NodeChange<SkillNode> =>
   replaceNodeState(node, node.data.state === 'unlocked' ? 'unlocked' : 'available');
-
-export const makeLocked = (node: SkillNode): NodeChange<SkillNode> => replaceNodeState(node, 'locked');
 
 export const makeUnlocked = (node: SkillNode): NodeChange<SkillNode> => replaceNodeState(node, 'unlocked');
 
 /**
  * Creates a `NodeChange` that switched node state.
  */
-const replaceNodeState = (node: SkillNode, newState: SkillNodeState): NodeChange<SkillNode> => ({
+export const replaceNodeState = (node: SkillNode, newState: SkillNodeState): NodeChange<SkillNode> => ({
   type: 'replace',
   id: node.id,
   item: { ...node, data: { ...node.data, state: newState } },
